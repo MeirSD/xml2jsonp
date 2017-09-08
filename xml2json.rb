@@ -6,9 +6,14 @@ class Xml2Json < Sinatra::Base
 
   get '/' do
     if params['url']
+      callback = params.delete('callback')
       response = HTTParty.get(params['url'])
       r = response.dup.to_json
-      "#{params['callback']}(#{r})"
+      if callback
+        content_type :js
+        return "#{callback}(#{r})"
+      end
+      r
     else
       content_type :html
       %Q(
